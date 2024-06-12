@@ -189,7 +189,7 @@ if st.session_state.page == "Accueil":
 
 elif st.session_state.page == "Recommander une recette":
     st.header('Tell us what you would like to eat and we will recommend you a recipe')
-    st.text('Get a recipe recommendation based on: ')
+    st.subheader('Get a recipe recommendation based on: ')
 
     # Radio button pour la sélection du modèle
     modelSelection = st.radio(label='',
