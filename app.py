@@ -4,7 +4,7 @@ import pandas as pd
 import requests
 
 tags_data = {
-    'Categorie': ['Cuisine type', 'Diet type', 'Type', 'Occasion', 'Equipment'],
+    'Categorie': ['Cuisine origin', 'Diet type', 'Category', 'Occasion', 'Equipment'],
     'Tags': [['african',
         'american','amish mennonite','angolan','argentine',
         'asian','australian','austrian','beijing','belgian'
@@ -945,7 +945,7 @@ recipe_data = {
 def display_results(results):
     suggestions = results.get('suggestions', [])
     for suggestion in suggestions:
-        recipe_id, recipe_name, recipe_url = suggestion
+        recipe_id, recipe_name, recipe_url = suggestion['index'], suggestion['name'], suggestion['url']
         st.markdown(f"""
             <div style="border: 1px solid #ddd; border-radius: 10px; padding: 10px; margin: 10px 0;">
                 <a href="{recipe_url}" target="_blank" style="text-decoration: none;">
@@ -972,9 +972,10 @@ def validate_tags(selected_tags, valid_tags):
 
 # Affichage conditionnel basé sur la page sélectionnée
 if st.session_state.page == "Get recipe recomandation":
-    st.header("Welcome on the Recettes et sentiments app")
+    st.header("Welcome to Recettes et sentiments")
+    st.subheader('Give us a recipe, we\'ll find you something similar')
     # Formulaire avec un champ de saisie auto-complété basé sur les clés du dictionnaire recipe_data
-    recipe_name = st.selectbox('Choose a recipe:', list(recipe_data.keys()))
+    recipe_name = st.selectbox('Select: ', list(recipe_data.keys()))
 
     if st.button('Submit'):
         recipe_id = recipe_data.get(recipe_name, None)
@@ -992,20 +993,20 @@ if st.session_state.page == "Get recipe recomandation":
             st.error("Recipe non found")
 
 elif st.session_state.page == "Discover recipes":
-    st.header('Tell us what you would like to eat and we will recommend you a recipe')
+    st.header('Looking for inspiration?')
     st.subheader('Get a recipe recommendation based on: ')
 
     # Radio button pour la sélection du modèle
     modelSelection = st.radio(label='',
-                              options=['Tags', 'Ingredients', 'Tags & Ingredients'],
+                              options=['Theme', 'Ingredients', 'Theme & Ingredients'],
                               horizontal=True)
 
     # Affichage conditionnel basé sur la sélection du modèle
-    if modelSelection == 'Tags':
+    if modelSelection == 'Theme':
         tag_inputs = {}
         for index, row in df_tags.iterrows():
             tag_inputs[row['Categorie']] = stt.st_tags(
-                label=f'Select {row["Categorie"]} tags',
+                label=f'Select by {row["Categorie"]}',
                 suggestions=row['Tags'],
             )
 
@@ -1045,7 +1046,7 @@ elif st.session_state.page == "Discover recipes":
             else:
                 st.error('Vous avez entré un ou plusieurs ingrédients invalides')
 
-    elif modelSelection == 'Tags & Ingredients':
+    elif modelSelection == 'Theme & Ingredients':
         tag_inputs = {}
         for index, row in df_tags.iterrows():
             tag_inputs[row['Categorie']] = stt.st_tags(
