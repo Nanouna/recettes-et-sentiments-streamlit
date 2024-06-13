@@ -972,9 +972,9 @@ def validate_tags(selected_tags, valid_tags):
 
 # Affichage conditionnel basé sur la page sélectionnée
 if st.session_state.page == "Get recipe recomandation":
-    st.header("Welcome on Recettes et sentiments app")
+    st.header("Welcome on the Recettes et sentiments app")
     # Formulaire avec un champ de saisie auto-complété basé sur les clés du dictionnaire recipe_data
-    recipe_name = st.selectbox('Choisissez une recette:', list(recipe_data.keys()))
+    recipe_name = st.selectbox('Choose a recipe:', list(recipe_data.keys()))
 
     if st.button('Submit'):
         recipe_id = recipe_data.get(recipe_name, None)
@@ -987,9 +987,9 @@ if st.session_state.page == "Get recipe recomandation":
                 results = response.json()
                 display_results(results)
             else:
-                st.error(f"Erreur lors de la requête : {response.status_code}")
+                st.error(f"Request error : {response.status_code}")
         else:
-            st.error("Recette non trouvée")
+            st.error("Recipe non found")
 
 elif st.session_state.page == "Discover recipes":
     st.header('Tell us what you would like to eat and we will recommend you a recipe')
@@ -997,19 +997,19 @@ elif st.session_state.page == "Discover recipes":
 
     # Radio button pour la sélection du modèle
     modelSelection = st.radio(label='',
-                              options=['By tags', 'By ingredients', 'By tags & ingredients'],
+                              options=['Tags', 'Ingredients', 'Tags & Ingredients'],
                               horizontal=True)
 
     # Affichage conditionnel basé sur la sélection du modèle
-    if modelSelection == 'By tags':
+    if modelSelection == 'Tags':
         tag_inputs = {}
         for index, row in df_tags.iterrows():
             tag_inputs[row['Categorie']] = stt.st_tags(
-                label=f'Sélect {row["Categorie"]} tags',
+                label=f'Select {row["Categorie"]} tags',
                 suggestions=row['Tags'],
             )
 
-        if st.button('Soumettre Tags'):
+        if st.button('Submit'):
             query = []
             for category, tags in tag_inputs.items():
                 if validate_tags(tags, df_tags.loc[df_tags['Categorie'] == category, 'Tags'].values[0]):
@@ -1024,15 +1024,15 @@ elif st.session_state.page == "Discover recipes":
                 results = response.json()
                 display_results(results)
             else:
-                st.error(f"Erreur lors de la requête : {response.status_code}")
+                st.error(f"Rquest Error: {response.status_code}")
 
-    elif modelSelection == 'By ingredients':
+    elif modelSelection == 'Ingredients':
         ingredients_input = stt.st_tags(
-            label='Sélectionnez des ingrédients',
+            label='Select ingredients',
             suggestions=ingredients_list,
         )
 
-        if st.button('Soumettre Ingrédients'):
+        if st.button('Submit'):
             if validate_tags(ingredients_input, ingredients_list):
                 query_str = "%20".join(ingredients_input)
                 url = f"https://recettes-et-sentiments-api-p4x6pl7fiq-ew.a.run.app/model_w2vec_query_recipe_with_ingredients?query={query_str}"
@@ -1041,37 +1041,37 @@ elif st.session_state.page == "Discover recipes":
                     results = response.json()
                     display_results(results)
                 else:
-                    st.error(f"Erreur lors de la requête : {response.status_code}")
+                    st.error(f"Request error : {response.status_code}")
             else:
                 st.error('Vous avez entré un ou plusieurs ingrédients invalides')
 
-    elif modelSelection == 'By tags & ingredients':
+    elif modelSelection == 'Tags & Ingredients':
         tag_inputs = {}
         for index, row in df_tags.iterrows():
             tag_inputs[row['Categorie']] = stt.st_tags(
-                label=f'Sélectionnez des tags pour {row["Categorie"]}',
+                label=f'Select tags for {row["Categorie"]}',
                 suggestions=row['Tags'],
             )
 
         ingredients_input = stt.st_tags(
-            label='Sélectionnez des ingrédients',
+            label='Select ingredients',
             suggestions=ingredients_list,
         )
 
-        if st.button('Soumettre Tout'):
+        if st.button('Submit'):
             all_valid = True
             query = []
             for category, tags in tag_inputs.items():
                 if validate_tags(tags, df_tags.loc[df_tags['Categorie'] == category, 'Tags'].values[0]):
                     query.extend(tags)
                 else:
-                    st.error(f'Vous avez entré un ou plusieurs tags invalides pour {category}')
+                    st.error(f'You have imputed at least one invalid tags for {category}')
                     all_valid = False
 
             if validate_tags(ingredients_input, ingredients_list):
                 query.extend(ingredients_input)
             else:
-                st.error('Vous avez entré un ou plusieurs ingrédients invalides')
+                st.error('You have imputed at least one invalid ingredients')
                 all_valid = False
 
             if all_valid:
@@ -1082,4 +1082,4 @@ elif st.session_state.page == "Discover recipes":
                     results = response.json()
                     display_results(results)
                 else:
-                    st.error(f"Erreur lors de la requête : {response.status_code}")
+                    st.error(f"Request error : {response.status_code}")
