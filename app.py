@@ -942,6 +942,8 @@ recipe_data = {
     'dream coffee cake': 372510,
 }
 
+st.sidebar.image(r'pexels-pixabay-33242.jpg', use_column_width=True)
+
 def display_results(results):
     suggestions = results.get('suggestions', [])
     for suggestion in suggestions:
